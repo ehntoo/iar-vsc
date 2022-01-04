@@ -83,6 +83,7 @@ export namespace Settings {
         CppStandard = "cppStandard",
         ExtraBuildArguments = "extraBuildArguments",
         IarInstallDirectories = "iarInstallDirectories",
+        ExcludeProjectFolders = "excludeProjectFolders",
     }
 
     const section = "iarvsc";
@@ -192,6 +193,10 @@ export namespace Settings {
 
     export function getExtraBuildArguments(): Array<string> {
         return Vscode.workspace.getConfiguration(section).get(Field.ExtraBuildArguments) as Array<string>;
+    }
+
+    export function getExcludeProjectFolders(): Array<string> {
+        return Vscode.workspace.getConfiguration(section).get(Field.ExcludeProjectFolders) as Array<string>;
     }
 
     function generateSettingsFilePath(): Fs.PathLike {

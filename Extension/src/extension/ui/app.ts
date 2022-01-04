@@ -135,7 +135,8 @@ class Application {
     private createProjectUi(): UI<Project> {
         let projects: Project[] = [];
         if (Vscode.workspace.rootPath) {
-            const excludeFolders = Vscode.workspace.getConfiguration("iarvsc").get("excludeProjectFolders");
+            const excludeFolders = Settings.getExcludeProjectFolders();
+            // const excludeFolders = Vscode.workspace.getConfiguration("iarvsc").get("excludeProjectFolders");
             projects = Project.createProjectsFrom(Vscode.workspace.rootPath, excludeFolders, true);
         }
 

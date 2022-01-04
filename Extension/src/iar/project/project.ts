@@ -153,7 +153,7 @@ export namespace Project {
     }
 
     export function createProjectsFrom(directory: Fs.PathLike, excludeFolders: Array<string> = [], recursive: boolean = true): Project[] {
-        excludeFolders = excludeFolders.map(x => Path.resolve(x));
+        excludeFolders = excludeFolders.map(x => Path.resolve(directory.toString(), x));
         let projectPaths = findProjectFilesIn(directory, excludeFolders, recursive);
 
         let projects = new Array<Project>();
@@ -174,7 +174,7 @@ export namespace Project {
             let stat = Fs.statSync(path);
 
             for (let i = 0; i < excludeFolders.length; ++i) {
-                let relative = Path.relative(excludeFolders[i], path);
+                let relative = Path.relative(excludeFolders[i], path.toString());
                 if (!relative || !relative.startsWith('..') || Path.isAbsolute(relative)) {
                     return false;
                 }
