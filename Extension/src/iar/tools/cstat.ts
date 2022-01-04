@@ -8,7 +8,7 @@ import { OsUtils } from "../../utils/utils";
 import { spawn } from "child_process";
 import { PathLike } from "fs";
 import { join, dirname } from "path";
-import CsvParser = require("csv-parse/lib/sync");
+import { parse as csvParse } from 'csv-parse/sync';
 import * as Fs from "fs";
 
 /**
@@ -72,7 +72,7 @@ export namespace CStat {
                         sqlProc.stdout.on('data', data => {
                             output += data.toString();
                             try {
-                                const warnsRaw: string[][] = CsvParser(output);
+                                const warnsRaw: string[][] = csvParse(output);
                                 const warnings = warnsRaw.map(row => parseWarning(row));
                                 if (warnings.length === expectedRows) {
                                     resolve(warnings);  // We are done
