@@ -84,6 +84,7 @@ export namespace Settings {
         ExtraBuildArguments = "extraBuildArguments",
         IarInstallDirectories = "iarInstallDirectories",
         ExcludeProjectFolders = "excludeProjectFolders",
+        BuildParallelism = "buildParallelism",
     }
 
     const section = "iarvsc";
@@ -197,6 +198,10 @@ export namespace Settings {
 
     export function getExcludeProjectFolders(): Array<string> {
         return Vscode.workspace.getConfiguration(section).get(Field.ExcludeProjectFolders) as Array<string>;
+    }
+
+    export function getBuildParallelism(): number {
+        return Vscode.workspace.getConfiguration(section).get(Field.BuildParallelism) as number;
     }
 
     function generateSettingsFilePath(): Fs.PathLike {

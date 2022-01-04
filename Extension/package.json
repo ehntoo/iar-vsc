@@ -195,6 +195,11 @@
           "type": "array",
           "markdownDescription": "Folders in which project files will not be searched.",
           "default": []
+        },
+        "iarvsc.buildParallelism": {
+          "type": "number",
+          "markdownDescription": "Number of threads to use while compiling",
+          "default": 1
         }
       }
     },

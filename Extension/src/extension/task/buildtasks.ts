@@ -88,6 +88,11 @@ export namespace BuildTasks {
             args = args.concat(extraArgs);
         }
 
+        let threads = Settings.getBuildParallelism();
+        if (threads > 1) {
+            args = args.concat(["-parallel", threads.toString()]);
+        }
+
         let process = new IarExecution(
             builder,
             args
