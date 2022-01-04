@@ -10,6 +10,7 @@ import { PathLike } from "fs";
 import { join, dirname } from "path";
 import { parse as csvParse } from 'csv-parse/sync';
 import * as Fs from "fs";
+import { Settings } from "../../extension/settings";
 
 /**
  * Functions for interacting with C-STAT
@@ -112,7 +113,13 @@ export namespace CStat {
         const dbPath = getCStatDBPath(projectPath, configurationName);
         if (Fs.existsSync(dbPath)) { Fs.unlinkSync(dbPath); }
 
-        const iarbuild = spawn(builderPath.toString(), [projectPath.toString(), "-cstat_analyze", configurationName.toString(), "-log", "info"]);
+        let builderArgs = [projectPath.toString(), "-cstat_analyze", configurationName.toString(), "-log", "info"];
+        const varFile = Settings.getVarFile();
+        if (varFile !== undefined) {
+            builderArgs = builderArgs.concat(["-varfile", varFile.toString()]);
+        }
+
+        const iarbuild = spawn(builderPath.toString(), builderArgs);
         iarbuild.stdout.on("data", data => {
             if (onWrite) {
                 onWrite(data.toString());

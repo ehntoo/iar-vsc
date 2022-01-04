@@ -19,6 +19,7 @@ import * as Path from "path";
 import { OsUtils, LanguageUtils } from "../../utils/utils";
 import { PartialSourceFileConfiguration } from "./data/partialsourcefileconfiguration";
 import { PreIncludePath } from "./data/preincludepath";
+import { Settings } from "../settings";
 
 /**
  * Generates/detects per-file configuration data (include paths/defines) for an entire project,
@@ -78,7 +79,12 @@ export class DynamicConfigGenerator {
             if (OsUtils.OsType.Windows === OsUtils.detectOsType()) {
                 builderPath += ".exe";
             }
-            const builderProc = spawn(builderPath, [project.path.toString(), "-dryrun", config.name, "-log", "all"]);
+            let builderArgs = [project.path.toString(), "-dryrun", config.name, "-log", "all"];
+            const varfile = Settings.getVarFile();
+            if (varfile !== undefined) {
+                builderArgs = builderArgs.concat(["-varfile", varfile]);
+            }
+            const builderProc = spawn(builderPath, builderArgs);
             builderProc.on("error", (err) => {
                 this.output.appendLine("Canceled.");
                 reject(err);

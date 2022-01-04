@@ -206,7 +206,13 @@ export namespace Settings {
     }
 
     export function getVarFile(): string | undefined {
-        return Vscode.workspace.getConfiguration(section).get(Field.VarFile);
+        const file = Vscode.workspace.getConfiguration(section).get(Field.VarFile) as string;
+        const rootPath = Vscode.workspace.rootPath;
+        if (rootPath === undefined) {
+            return file;
+        } else {
+            return Path.resolve(rootPath, file);
+        }
     }
 
     function generateSettingsFilePath(): Fs.PathLike {

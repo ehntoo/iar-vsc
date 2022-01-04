@@ -201,7 +201,7 @@
           "markdownDescription": "Number of threads to use while compiling",
           "default": 1
         },
-        "iarvsc.varfile": {
+        "iarvsc.varFile": {
           "type": "string",
           "markdownDescription": "File to pass to iarbuild as -varfile",
           "default": "undefined"
