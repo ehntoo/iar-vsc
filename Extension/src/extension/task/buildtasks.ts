@@ -93,6 +93,11 @@ export namespace BuildTasks {
             args = args.concat(["-parallel", threads.toString()]);
         }
 
+        let varfile = Settings.getVarFile();
+        if (varfile !== undefined) {
+            args = args.concat(["-varfile", varfile]);
+        }
+
         let process = new IarExecution(
             builder,
             args
