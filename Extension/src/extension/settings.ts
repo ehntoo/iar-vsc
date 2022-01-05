@@ -8,6 +8,8 @@ import * as Vscode from "vscode";
 import * as Fs from "fs";
 import * as Path from "path";
 import { Handler } from "../utils/handler";
+import glob = require('glob');
+import { StringIncludePath } from "./configprovider/data/includepath";
 
 type cStandards = "c89" | "c99" | "c11";
 type cppStandards = "c++98" | "c++03" | "c++11" | "c++14" | "c++17";
@@ -79,6 +81,7 @@ export namespace Settings {
         Ewp = "ewp",
         Configuration = "configuration",
         Defines = "defines",
+        Includes = "includes",
         CStandard = "cStandard",
         CppStandard = "cppStandard",
         ExtraBuildArguments = "extraBuildArguments",
@@ -168,6 +171,19 @@ export namespace Settings {
 
         if (defines) {
             return defines as string[];
+        } else {
+            return [];
+        }
+    }
+
+    export function getIncludes(): StringIncludePath[] {
+        let includes = Vscode.workspace.getConfiguration(section).get(Field.Includes);
+
+        if (includes) {
+            const rootPath = Vscode.workspace.rootPath;
+            let globbedIncludes = (includes as string[]).flatMap(i => glob.sync(i, {cwd: rootPath}));
+            globbedIncludes = globbedIncludes.map(i => Path.resolve(rootPath ?? "", i));
+            return globbedIncludes.map(i => new StringIncludePath(i));
         } else {
             return [];
         }

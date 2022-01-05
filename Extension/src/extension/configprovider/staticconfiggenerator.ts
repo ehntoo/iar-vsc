@@ -17,6 +17,7 @@ import * as Fs from "fs";
 import * as Process from "child_process";
 import { Project } from "../../iar/project/project";
 import { PartialSourceFileConfiguration } from "./data/partialsourcefileconfiguration";
+import { Settings } from "../settings";
 
 /**
  * Detects source file configuration for an IAR project.
@@ -30,6 +31,7 @@ export namespace StaticConfigGenerator {
         let defines: Define[] = [];
         let includepaths: IncludePath[] = [];
         let preincludes: PreIncludePath[] = [];
+        let userIncludes = Settings.getIncludes();
 
         if (config && project) {
             const configSpecifics = generateConfigSpecifics(language, config, project);
@@ -45,6 +47,8 @@ export namespace StaticConfigGenerator {
             preincludes = preincludes.concat(compilerSpecifics.preIncludes);
         }
 
+        includepaths = includepaths.concat(userIncludes);
+        
         return {
             includes: includepaths,
             preIncludes: preincludes,

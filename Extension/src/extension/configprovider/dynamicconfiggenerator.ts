@@ -228,7 +228,8 @@ export class DynamicConfigGenerator {
             compilerProc.stdout.on("data", (chunk: Buffer) => { chunks.push(chunk); });
             compilerProc.stdout.on("end", () => {
                 const output = Buffer.concat(chunks).toString();
-                const includePaths = IncludePath.fromCompilerOutput(output);
+                let includePaths = IncludePath.fromCompilerOutput(output);
+                includePaths = includePaths.concat(Settings.getIncludes());
                 const defines = Define.fromSourceFile(macrosOutFile);
                 const preIncludePaths = PreIncludePath.fromCompilerArgs(compilerArgs, Path.parse(project.path.toString()).dir);
                 resolve({
