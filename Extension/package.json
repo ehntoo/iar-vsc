@@ -113,6 +113,7 @@
         "iarvsc.iarInstallDirectories": {
           "type": "array",
           "description": "Root path where IAR installs its applications.",
+          "scope": "resource",
           "default": [
             "C:\\Program Files\\IAR Systems",
             "C:\\Program Files (x86)\\IAR Systems"
@@ -121,6 +122,7 @@
         "iarvsc.defines": {
           "type": "array",
           "description": "A list of defines to use which are not listed in the project xml or compiler output. You can for example define here compiler intrisics, like __max, __min, __eeprom, .... example __max: add `__max(a, b)=` to this list.",
+          "scope": "resource",
           "default": [
             "_Pragma(x)=",
             "__eeprom=",
@@ -132,10 +134,12 @@
         "iarvsc.includes": {
           "type": "array",
           "description": "A list of includes to add which are not listed in the project xml or compiler output.",
+          "scope": "resource",
           "default": []
         },
         "iarvsc.cStandard": {
           "type": "string",
+          "scope": "resource",
           "enum": [
             "c89",
             "c99",
@@ -146,6 +150,7 @@
         },
         "iarvsc.cppStandard": {
           "type": "string",
+          "scope": "resource",
           "enum": [
             "c++98",
             "c++03",
@@ -160,6 +165,7 @@
           "description": "C-STAT warnings with a lower severity than this are filtered out.",
           "default": "Medium",
           "type": "string",
+          "scope": "resource",
           "enum": [
             "Low",
             "Medium",
@@ -169,46 +175,55 @@
         "iarvsc.c-StatDisplayLowSeverityWarningsAsHints": {
           "description": "If the filter level is set to Low, displays low severity C-STAT warnings as hints rather than warnings. This hides them from the problem list, but still shows them in the editor.",
           "type": "boolean",
+          "scope": "resource",
           "default": false
         },
         "iarvsc.outFile": {
           "type": "string",
           "description": "Currently not used, but will be used in the future to generate launch configurations.",
+          "scope": "resource",
           "default": ""
         },
         "iarvsc.gdb": {
           "type": "string",
           "markdownDescription": "The path to the gdb debugger to use. In case the executable is not on the `PATH` environment, you have to specify the full path.",
+          "scope": "resource",
           "default": "arm-none-eabi-gdb.exe"
         },
         "iarvsc.gdbServer": {
           "type": "string",
           "markdownDescription": "The path to the gdb server to use. In case the executable is not on the `PATH` environment, you have to specify the full path.",
+          "scope": "resource",
           "default": "JLinkGDBServerCL.exe"
         },
         "iarvsc.device": {
           "type": "string",
           "markdownDescription": "The name of the target microcontroller",
+          "scope": "resource",
           "default": "undefined"
         },
         "iarvsc.extraBuildArguments": {
           "type": "array",
           "markdownDescription": "Extra command line arguments to supply to IarBuild.exe.",
+          "scope": "resource",
           "default": []
         },
         "iarvsc.excludeProjectFolders": {
           "type": "array",
           "markdownDescription": "Folders in which project files will not be searched.",
+          "scope": "resource",
           "default": []
         },
         "iarvsc.buildParallelism": {
           "type": "number",
           "markdownDescription": "Number of threads to use while compiling",
+          "scope": "resource",
           "default": 1
         },
         "iarvsc.varFile": {
           "type": "string",
           "markdownDescription": "File to pass to iarbuild as -varfile",
+          "scope": "resource",
           "default": "undefined"
         }
       }
