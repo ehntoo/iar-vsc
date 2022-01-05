@@ -28,7 +28,7 @@ import { Settings } from "../settings";
  * Because of this, it is somewhat slow, but should be completely correct.
  */
 export class DynamicConfigGenerator {
-    private runningPromise: Promise<boolean> | null = null;
+    private runningPromise: Thenable<boolean> | null = null;
     private shouldCancel = false;
     private readonly cache: ConfigurationCache = new SimpleConfigurationCache();
     private readonly output: Vscode.OutputChannel = Vscode.window.createOutputChannel("Iar Config Generator");
@@ -39,7 +39,7 @@ export class DynamicConfigGenerator {
      * and caches the results
      * @returns true if the operation succeded (i.e. was not canceled and did not crash)
      */
-    public generateConfiguration(workbench: Workbench, project: Project, compiler: Compiler, config: Config): Promise<boolean> {
+    public generateConfiguration(workbench: Workbench, project: Project, compiler: Compiler, config: Config): Thenable<boolean> {
         // make sure we only run once at a time
         // this is probably safe since Node isnt multithreaded
         if (!this.runningPromise) {
@@ -73,56 +73,75 @@ export class DynamicConfigGenerator {
         this.output.dispose();
     }
 
-    private generateConfigurationImpl(workbench: Workbench, project: Project, compiler: Compiler, config: Config): Promise<boolean> {
-        return new Promise(async (resolve, reject) => {
-            let builderPath = join(workbench.path.toString(), "common/bin/IarBuild");
-            if (OsUtils.OsType.Windows === OsUtils.detectOsType()) {
-                builderPath += ".exe";
-            }
-            let builderArgs = [project.path.toString(), "-dryrun", config.name, "-log", "all"];
-            const varfile = Settings.getVarFile();
-            if (varfile !== undefined) {
-                builderArgs = builderArgs.concat(["-varfile", varfile]);
-            }
-            const builderProc = spawn(builderPath, builderArgs);
-            builderProc.on("error", (err) => {
-                this.output.appendLine("Canceled.");
-                reject(err);
+    private generateConfigurationImpl(workbench: Workbench, project: Project, compiler: Compiler, config: Config): Thenable<boolean> {
+        return Vscode.window.withProgress({
+            location: Vscode.ProgressLocation.Window,
+            cancellable: true,
+            title: 'Generating source completion DB'
+        }, (progress, token) => {
+            token.onCancellationRequested(() => {
+                this.shouldCancel = true;
             });
-
-            const compilerInvocations = await this.findCompilerInvocations(builderProc.stdout);
-
-            let hasIncorrectCompiler = false;
-            const fileConfigs: PartialSourceFileConfiguration[] = [];
-            for (let i = 0; i < compilerInvocations.length; i++) {
-                const compInv = compilerInvocations[i];
-                if (LanguageUtils.determineLanguage(compInv[1]) === undefined) {
-                    this.output.appendLine("Skipping file of unsupported type: " + compInv[1]);
-                    continue;
+            return new Promise(async (resolve, reject) => {
+                progress.report({
+                    increment: 0,
+                    message: "Getting list of source files and includes"
+                });
+                let builderPath = join(workbench.path.toString(), "common/bin/IarBuild");
+                if (OsUtils.OsType.Windows === OsUtils.detectOsType()) {
+                    builderPath += ".exe";
                 }
-                if (Path.parse(compInv[0]).name !== compiler.name) {
-                    this.output.appendLine(`WARN: Compiler name for ${compInv[1]} (${compInv[0]}) does not seem to match the selected compiler.`);
-                    hasIncorrectCompiler = true;
-                    continue;
+                let builderArgs = [project.path.toString(), "-dryrun", config.name, "-log", "all"];
+                const varfile = Settings.getVarFile();
+                if (varfile !== undefined) {
+                    builderArgs = builderArgs.concat(["-varfile", varfile]);
                 }
-                try {
-                    fileConfigs.push(await this.generateConfigurationForFile(compiler, compInv.slice(1), project));
-                } catch {}
+                const builderProc = spawn(builderPath, builderArgs);
+                builderProc.on("error", (err) => {
+                    this.output.appendLine("Canceled.");
+                    reject(err);
+                });
 
-                if (this.shouldCancel) {
-                    resolve(false);
-                    return;
+                const compilerInvocations = await this.findCompilerInvocations(builderProc.stdout);
+
+                let hasIncorrectCompiler = false;
+                const fileConfigs: PartialSourceFileConfiguration[] = [];
+                for (let i = 0; i < compilerInvocations.length; i++) {
+                    const compInv = compilerInvocations[i];
+                    if (LanguageUtils.determineLanguage(compInv[1]) === undefined) {
+                        this.output.appendLine("Skipping file of unsupported type: " + compInv[1]);
+                        continue;
+                    }
+                    if (Path.parse(compInv[0]).name !== compiler.name) {
+                        this.output.appendLine(`WARN: Compiler name for ${compInv[1]} (${compInv[0]}) does not seem to match the selected compiler.`);
+                        hasIncorrectCompiler = true;
+                        continue;
+                    }
+                    try {
+                        progress.report({
+                            increment: i / compilerInvocations.length,
+                            message: `Processing ${compInv[1]}`
+                        });
+                        this.output.appendLine(`Processing ${compInv[1]}.`);
+                        fileConfigs.push(await this.generateConfigurationForFile(compiler, compInv.slice(1), project));
+                    } catch {}
+
+                    if (this.shouldCancel) {
+                        resolve(false);
+                        return;
+                    }
                 }
-            }
 
-            fileConfigs.forEach((fileConfig, index) => {
-                const uri = Vscode.Uri.file(compilerInvocations[index][1]);
-                this.putConfiguration(uri, fileConfig);
+                fileConfigs.forEach((fileConfig, index) => {
+                    const uri = Vscode.Uri.file(compilerInvocations[index][1]);
+                    this.putConfiguration(uri, fileConfig);
+                });
+                if (hasIncorrectCompiler) {
+                    Vscode.window.showWarningMessage("IAR: The selected compiler does not appear to match the one used by the project.");
+                }
+                this.output.appendLine('Generation complete');
+                resolve(true);
             });
-            if (hasIncorrectCompiler) {
-                Vscode.window.showWarningMessage("IAR: The selected compiler does not appear to match the one used by the project.");
-            }
-            resolve(true);
         });
     }
 

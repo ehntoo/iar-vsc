@@ -81,7 +81,7 @@ export class IarConfigurationProvider implements CustomConfigurationProvider {
         const lang = LanguageUtils.determineLanguage(uri.fsPath);
         return Promise.resolve(lang !== undefined);
     }
-    provideConfigurations(uris: Vscode.Uri[], _token?: CancellationToken | undefined): Promise<SourceFileConfigurationItem[]> {
+    provideConfigurations(uris: Vscode.Uri[], _token?: CancellationToken | undefined): Thenable<SourceFileConfigurationItem[]> {
         const cStandard = Settings.getCStandard();
         const cppStandard = Settings.getCppStandard();
 
@@ -101,7 +101,7 @@ export class IarConfigurationProvider implements CustomConfigurationProvider {
                 defines: stringDefines,
                 includePath: mergedConfiguration.includes.map(i => i.absolutePath.toString()),
                 forcedInclude: mergedConfiguration.preIncludes.map(i => i.absolutePath.toString()),
-                intelliSenseMode: "msvc-x64",
+                intelliSenseMode: "gcc-arm",
                 standard: lang === "c" ? cStandard : cppStandard,
             };
             return {
