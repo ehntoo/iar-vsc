@@ -50,7 +50,7 @@ export class IarConfigurationProvider implements CustomConfigurationProvider {
     private fallbackConfigurationCpp: PartialSourceFileConfiguration = {includes: [], preIncludes: [], defines: []};
 
     readonly name = "iar-vsc";
-    readonly extensionId = "pluyckx.iar-vsc";
+    readonly extensionId = "ehntoo.iar-vsc";
 
     // if api is undefined, just outputs json file
     private constructor(private readonly api: CppToolsApi | undefined, private readonly generator: DynamicConfigGenerator) {

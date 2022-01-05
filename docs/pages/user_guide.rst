@@ -38,13 +38,13 @@ Configuring
 The extension will automatically detect Embedded Workbench installations on your systems, as well as IAR projects in your VS Code workspace.
 You may select which workbench to use, which configuration to build, and other settings using buttons in the statusbar.
 
-.. image:: https://raw.githubusercontent.com/pluyckx/iar-vsc/master/Extension/images/readme/statusbar.png
+.. image:: https://raw.githubusercontent.com/ehntoo/iar-vsc/master/Extension/images/readme/statusbar.png
 
 You can also call the commands behind those buttons, see the ``contribution`` tab in the extension section of VS Code.
 There is also a view in the explorer tab for changing these settings. The explorer view and status bar view are functionally equivalent,
 so if you want you can hide one of them by right clicking on it.
 
-.. image:: https://raw.githubusercontent.com/pluyckx/iar-vsc/master/Extension/images/readme/treeview.png
+.. image:: https://raw.githubusercontent.com/ehntoo/iar-vsc/master/Extension/images/readme/treeview.png
 
 To configure your project, configure the following options:
 
