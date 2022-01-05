@@ -27,7 +27,7 @@ export namespace JsonConfigurationWriter {
             cStandard: Settings.getCStandard(),
             cppStandard: Settings.getCppStandard(),
             compilerPath: "",
-            intelliSenseMode: "msvc-x64",
+            intelliSenseMode: "gcc-arm",
         };
         if (provider) {
             jsonConfiguration["configurationProvider"] = provider;
