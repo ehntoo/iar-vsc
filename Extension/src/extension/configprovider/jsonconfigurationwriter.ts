@@ -6,10 +6,10 @@ import * as Vscode from "vscode";
 import * as Jsonc from "jsonc-parser";
 import * as Fs from "fs";
 import * as Path from "path";
-import * as equal from "fast-deep-equal";
 import { FsUtils } from "../../utils/fs";
 import { Settings } from "../settings";
 import { PartialSourceFileConfiguration } from "./data/partialsourcefileconfiguration";
+import equal = require("fast-deep-equal");
 
 /**
  * Writes a source file configuration to the 'c_cpp_properties.json' file.
