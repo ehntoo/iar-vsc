@@ -105,7 +105,7 @@ export class DynamicConfigGenerator {
                 const compilerInvocations = await this.findCompilerInvocations(builderProc.stdout);
 
                 let hasIncorrectCompiler = false;
-                const fileConfigs: PartialSourceFileConfiguration[] = [];
+                const compilerInvocationExecPromises: Thenable<PartialSourceFileConfiguration>[] = [];
                 for (let i = 0; i < compilerInvocations.length; i++) {
                     const compInv = compilerInvocations[i];
                     if (LanguageUtils.determineLanguage(compInv[1]) === undefined) {
@@ -123,14 +123,17 @@ export class DynamicConfigGenerator {
                             message: `Processing ${compInv[1]}`
                         });
                         this.output.appendLine(`Processing ${compInv[1]}.`);
-                        fileConfigs.push(await this.generateConfigurationForFile(compiler, compInv.slice(1), project));
+                        compilerInvocationExecPromises.push(this.generateConfigurationForFile(compiler, compInv.slice(1), project));
                     } catch {}
-
+                    
                     if (this.shouldCancel) {
                         resolve(false);
                         return;
                     }
                 }
+
+                const fileConfigResults: PromiseSettledResult<PartialSourceFileConfiguration>[] = await Promise.allSettled(compilerInvocationExecPromises);
+                const fileConfigs: PartialSourceFileConfiguration[] = fileConfigResults.filter((r): r is PromiseFulfilledResult<PartialSourceFileConfiguration> => r.status == "fulfilled").map(r => r.value);
 
                 fileConfigs.forEach((fileConfig, index) => {
                     const uri = Vscode.Uri.file(compilerInvocations[index][1]);
